@@ -1,0 +1,77 @@
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
+
+/* Custom animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom styles for better mobile responsiveness */
+@media (max-width: 640px) {
+  .text-8xl {
+    font-size: 4rem;
+  }
+  
+  .text-7xl {
+    font-size: 3rem;
+  }
+  
+  .text-5xl {
+    font-size: 2.5rem;
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Focus styles for accessibility */
+input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3);
+}
+
+/* Loading states */
+.loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
