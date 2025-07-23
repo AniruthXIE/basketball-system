@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <radialGradient id="basketballGradient" cx="0.3" cy="0.3" r="0.7">
+      <stop offset="0%" style="stop-color:#fbbf24"/>
+      <stop offset="50%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#d97706"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- Basketball circle -->
+  <circle cx="96" cy="96" r="92" fill="url(#basketballGradient)" stroke="#92400e" stroke-width="2"/>
+  
+  <!-- Basketball lines -->
+  <path d="M 19.200000000000003 96 Q 96 57.599999999999994 172.8 96 Q 96 134.39999999999998 19.200000000000003 96" 
+        fill="none" stroke="#92400e" stroke-width="3"/>
+  <path d="M 96 19.200000000000003 Q 134.39999999999998 96 96 172.8 Q 57.599999999999994 96 96 19.200000000000003" 
+        fill="none" stroke="#92400e" stroke-width="3"/>
+  
+  <!-- Highlight -->
+  <ellipse cx="67.19999999999999" cy="67.19999999999999" rx="28.799999999999997" ry="19.200000000000003" fill="#fde047" opacity="0.6"/>
+</svg>

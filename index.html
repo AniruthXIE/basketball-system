@@ -2,8 +2,36 @@
 <html lang="th">
   <head>
     <meta charset="UTF-8" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#fbbf24" />
+    <meta name="background-color" content="#1e293b" />
+    <meta name="display" content="standalone" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="BasketQ" />
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="ระบบจัดคิวบาสเกตบอลแบบ Real-time พร้อมการจัดการแชมป์, ทัวร์นาเมนต์, และสถิติ" />
+    <meta name="keywords" content="basketball, queue, sports, tournament, ระบบคิว, บาสเกตบอล" />
+    <meta name="author" content="Basketball Queue System" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Basketball Queue System 🏀" />
+    <meta property="og:description" content="ระบบจัดคิวบาสเกตบอลแบบ Real-time" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/icons/icon-512x512.png" />
+    
+    <!-- Icons -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    <link rel="mask-icon" href="/icons/icon-512x512.png" color="#fbbf24" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
     <title>🏀 Basketball Queue System</title>
     
     <!-- Tailwind CSS CDN -->
@@ -146,6 +174,126 @@
         </div>
       </div>
     </div>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+      // Register Service Worker for PWA functionality
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', async () => {
+          try {
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            console.log('✅ Service Worker registered successfully:', registration.scope);
+            
+            // Listen for updates
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              console.log('🔄 New Service Worker available');
+              
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('📱 New version available! Please refresh the page.');
+                  // Show update notification to user
+                  showUpdateNotification();
+                }
+              });
+            });
+            
+          } catch (error) {
+            console.error('❌ Service Worker registration failed:', error);
+          }
+        });
+      }
+
+      // PWA Install Prompt
+      let deferredPrompt;
+      let installButton;
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('💾 PWA Install prompt available');
+        e.preventDefault();
+        deferredPrompt = e;
+        showInstallButton();
+      });
+
+      function showInstallButton() {
+        // Create install button if it doesn't exist
+        if (!installButton) {
+          installButton = document.createElement('button');
+          installButton.textContent = '📲 ติดตั้งแอป';
+          installButton.className = 'fixed bottom-4 right-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-black px-4 py-2 rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 z-50';
+          installButton.onclick = installPWA;
+          document.body.appendChild(installButton);
+        }
+      }
+
+      async function installPWA() {
+        if (!deferredPrompt) return;
+        
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        console.log(`PWA install outcome: ${outcome}`);
+        
+        if (outcome === 'accepted') {
+          console.log('🎉 PWA installed successfully!');
+          if (installButton) {
+            installButton.remove();
+            installButton = null;
+          }
+        }
+        
+        deferredPrompt = null;
+      }
+
+      // Hide install button after successful installation
+      window.addEventListener('appinstalled', () => {
+        console.log('🎉 PWA installed successfully!');
+        if (installButton) {
+          installButton.remove();
+          installButton = null;
+        }
+      });
+
+      function showUpdateNotification() {
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 animate-slideInUp';
+        notification.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span>🔄 มีเวอร์ชันใหม่!</span>
+            <button onclick="window.location.reload()" class="bg-white text-blue-500 px-3 py-1 rounded-lg text-sm font-bold hover:bg-gray-100 transition-colors">
+              อัพเดท
+            </button>
+            <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200">
+              ✕
+            </button>
+          </div>
+        `;
+        document.body.appendChild(notification);
+        
+        // Auto remove after 10 seconds
+        setTimeout(() => {
+          if (notification.parentElement) {
+            notification.remove();
+          }
+        }, 10000);
+      }
+
+      // Handle URL parameters for shortcuts
+      const urlParams = new URLSearchParams(window.location.search);
+      const action = urlParams.get('action');
+      const page = urlParams.get('page');
+
+      if (action === 'new-game') {
+        console.log('🏀 Starting new game from shortcut');
+        // This will be handled by React app
+      }
+
+      if (page) {
+        console.log('📄 Opening page from shortcut:', page);
+        // This will be handled by React app
+      }
+    </script>
+    
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
