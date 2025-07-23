@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import { Trophy, Users, Play } from 'lucide-react';
-import { useGame } from '../contexts/GameContext';
+import { Trophy, Users, Play, ArrowLeft } from 'lucide-react';
+import { GAME_MODES, getGameConfig } from '../config/gameRules';
+import GameScoreboard from './GameScoreboard';
 
-const TournamentMode = () => {
-  const { updateGameState } = useGame();
+const TournamentMode = ({ gameMode = GAME_MODES.CASUAL }) => {
+  const config = getGameConfig(gameMode);
   const [tournamentPlayers, setTournamentPlayers] = useState([]);
   const [newPlayer, setNewPlayer] = useState('');
   const [tournamentType, setTournamentType] = useState('single'); // single, double
   const [isStarted, setIsStarted] = useState(false);
   const [bracket, setBracket] = useState([]);
+  const [currentMatch, setCurrentMatch] = useState(null);
+  const [showScoreboard, setShowScoreboard] = useState(false);
 
   const addPlayer = () => {
     if (newPlayer.trim() && !tournamentPlayers.includes(newPlayer.trim())) {
@@ -57,21 +60,21 @@ const TournamentMode = () => {
   };
 
   const startMatch = (match) => {
-    // Start this match in the main game
-    updateGameState({
-      currentGame: {
-        teamA: match.player1,
-        teamB: match.player2,
-        teamAScore: 0,
-        teamBScore: 0,
-        isPlaying: false,
-        timeLeft: 420
-      },
-      queue: [],
-      champion: null,
-      championDefenseStreak: 0,
-      formerChampionName: null
-    });
+    setCurrentMatch(match);
+    setShowScoreboard(true);
+  };
+
+  const handleGameEnd = (gameResult) => {
+    if (currentMatch) {
+      completeMatch(currentMatch.id, gameResult.winner);
+      setShowScoreboard(false);
+      setCurrentMatch(null);
+    }
+  };
+
+  const backToBracket = () => {
+    setShowScoreboard(false);
+    setCurrentMatch(null);
   };
 
   const completeMatch = (matchId, winner) => {
@@ -121,6 +124,36 @@ const TournamentMode = () => {
     if (round === maxRounds - 2) return 'รอบ 8 คนสุดท้าย';
     return `รอบที่ ${round}`;
   };
+
+  // Show scoreboard when match is active
+  if (showScoreboard && currentMatch) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4 mb-6">
+          <button
+            onClick={backToBracket}
+            className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-xl font-bold transition-all"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            กลับไป Bracket
+          </button>
+          <div className="text-center flex-1">
+            <h2 className="text-2xl font-bold text-white">
+              {currentMatch.player1} VS {currentMatch.player2}
+            </h2>
+            <p className="text-gray-300">{config.name} Tournament</p>
+          </div>
+        </div>
+        
+        <GameScoreboard 
+          gameMode={gameMode} 
+          onGameEnd={handleGameEnd}
+          initialTeamA={currentMatch.player1}
+          initialTeamB={currentMatch.player2}
+        />
+      </div>
+    );
+  }
 
   if (!isStarted) {
     return (
